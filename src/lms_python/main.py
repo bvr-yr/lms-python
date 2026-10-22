@@ -2,6 +2,8 @@ from pathlib import Path
 from pprint import pprint
 
 from lms_python.db.connection import connection_manager
+from lms_python.db.loader import DatabaseLoader
+from lms_python.db.repository import StudentRepository
 from lms_python.db.schema import SchemaManager
 from lms_python.reader import JSONReader
 
@@ -12,7 +14,23 @@ def main() -> None:
         char = "="
         print(f"\n{char * 10} {header} {char * (33 - len(header))}")
 
-    print_header("SMOKE DB TEST")
+    print_header("READER TEST")
+    reader = JSONReader()
+
+    data_dir = Path(__file__).parent / "data"
+    rooms_path = data_dir / "rooms.json"
+    students_path = data_dir / "students.json"
+
+    rooms = reader.read(rooms_path)
+    students = reader.read(students_path)
+
+    print(f"records: rooms:{len(rooms)}, students:{len(students)}")
+
+    for t in rooms, students:
+        print()
+        pprint(t[:5])  # noqa: T203
+
+    print_header("DB OPERATIONS TESTS")
     # INFO: https://docs.astral.sh/ruff/rules/multiple-with-statements/
     with connection_manager.get_connection() as connection:
         with connection.cursor() as cursor:
@@ -33,21 +51,23 @@ def main() -> None:
             )
             print(f"tables: {cursor.fetchall()}")
 
-    print_header("READER TEST")
-    reader = JSONReader()
+        with connection.transaction():
+            schema = SchemaManager(connection)
+            loader = DatabaseLoader(connection)
+            repo = StudentRepository(connection, loader)
 
-    data_dir = Path(__file__).parent / "data"
-    rooms_path = data_dir / "rooms.json"
-    students_path = data_dir / "students.json"
+            schema.truncate_tables()
+            repo.insert_rooms(rooms)
+            repo.insert_students(students)
 
-    rooms = reader.read(rooms_path)
-    students = reader.read(students_path)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT count(*) FROM rooms;")
+            rooms_count = cursor.fetchone()
 
-    print(f"records: rooms:{len(rooms)}, students:{len(students)}")
+            cursor.execute("SELECT count(*) FROM students;")
+            students_count = cursor.fetchone()
 
-    for t in rooms, students:
-        print()
-        pprint(t[:5])  # noqa: T203
+            print(f"rows: rooms:{rooms_count}, students: {students_count}")
 
 
 if __name__ == "__main__":
