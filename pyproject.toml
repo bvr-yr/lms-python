@@ -1,0 +1,20 @@
+[project]
+name = "lms-python"
+version = "0.1.0"
+description = "Innowise LMS Python module practice task"
+readme = "README.md"
+authors = [
+{ name = "Yury Babrounik", email = "bvr0909@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "psycopg[binary]>=3.3.6",
+    "pydantic-settings>=2.16.1",
+]
+
+[project.scripts]
+task = "lms_python.main:main"
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
