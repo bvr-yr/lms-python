@@ -1,9 +1,18 @@
+from pathlib import Path
+from pprint import pprint
+
 from lms_python.db.connection import connection_manager
 from lms_python.db.schema import SchemaManager
+from lms_python.reader import JSONReader
 
 
 def main() -> None:
-    print("====== SMOKE TEST ======")
+
+    def print_header(header: str) -> None:
+        char = "="
+        print(f"\n{char * 10} {header} {char * (33 - len(header))}")
+
+    print_header("SMOKE DB TEST")
     # INFO: https://docs.astral.sh/ruff/rules/multiple-with-statements/
     with connection_manager.get_connection() as connection:
         with connection.cursor() as cursor:
@@ -23,6 +32,22 @@ def main() -> None:
                 """,
             )
             print(f"tables: {cursor.fetchall()}")
+
+    print_header("READER TEST")
+    reader = JSONReader()
+
+    data_dir = Path(__file__).parent / "data"
+    rooms_path = data_dir / "rooms.json"
+    students_path = data_dir / "students.json"
+
+    rooms = reader.read(rooms_path)
+    students = reader.read(students_path)
+
+    print(f"records: rooms:{len(rooms)}, students:{len(students)}")
+
+    for t in rooms, students:
+        print()
+        pprint(t[:5])  # noqa: T203
 
 
 if __name__ == "__main__":
