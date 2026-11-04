@@ -1,11 +1,14 @@
 import xml.etree.ElementTree as ET
+from collections.abc import Sequence
 from pathlib import Path
 
-from lms_python.exporters.base import BaseExporter, ExportData
+from pydantic import BaseModel
+
+from lms_python.exporters.base import BaseExporter
 
 
 class XMLExporter(BaseExporter):
-    def _write(self, data: ExportData, path: Path) -> None:
+    def _write(self, data: Sequence[BaseModel], path: Path) -> None:
         root = ET.Element("results")
 
         for item in data:
