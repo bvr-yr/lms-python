@@ -1,6 +1,6 @@
 from psycopg import Connection
 
-from lms_python.db.utils import load_sql_resource
+from lms_python.db.resources import load_sql_resource
 
 
 class SchemaManager:
@@ -14,4 +14,9 @@ class SchemaManager:
 
     def truncate_tables(self) -> None:
         with self._conn.cursor() as cursor:
+            cursor.execute("DROP INDEX IF EXISTS idx_students_room_id;")
             cursor.execute("TRUNCATE TABLE students, rooms RESTART IDENTITY CASCADE;")
+
+    def create_index(self) -> None:
+        with self._conn.cursor() as cursor:
+            cursor.execute("CREATE INDEX idx_students_room_id ON students (room_id);")
