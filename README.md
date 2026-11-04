@@ -5,5 +5,5 @@
 cp .env.example .env
 docker compose up -d
 uv sync
-uv run task
+uv run task -r data/rooms.json -s data/students.json
 ```
