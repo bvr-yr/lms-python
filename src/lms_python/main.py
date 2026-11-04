@@ -1,11 +1,21 @@
 import argparse
+from pathlib import Path
 
 from lms_python.db.analytics import DataAnalytics
 from lms_python.db.connection import connection_manager
 from lms_python.db.ingestion import DataIngestor
 from lms_python.db.schema import SchemaManager
+from lms_python.exporters.json import JSONExporter
+from lms_python.exporters.xml import XMLExporter
 from lms_python.models import Room, Student
 from lms_python.readers.json import JSONReader
+
+EXPORTERS = {
+    "json": JSONExporter(),
+    "xml": XMLExporter(),
+}
+
+OUTPUT_DIR = Path("output")
 
 
 def parse_args() -> argparse.Namespace:
@@ -14,6 +24,14 @@ def parse_args() -> argparse.Namespace:
         "-s", "--students", required=True, help="Path to students JSON file"
     )
     parser.add_argument("-r", "--rooms", required=True, help="Path to rooms JSON file")
+    parser.add_argument(
+        "-f",
+        "--format",
+        required=False,
+        default="json",
+        choices=EXPORTERS.keys(),
+        help="Output format",
+    )
     return parser.parse_args()
 
 
@@ -36,7 +54,12 @@ def main() -> None:
             schema.create_index()
 
         analytics = DataAnalytics(connection)
-        analytics.execute_reports()
+        reports = analytics.execute_reports()
+
+    exporter = EXPORTERS[args.format]
+    for report_name, data in reports.items():
+        output_path = OUTPUT_DIR / f"{report_name}.{args.format}"
+        exporter.export(data, output_path)
 
 
 if __name__ == "__main__":
