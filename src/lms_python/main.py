@@ -1,5 +1,6 @@
 import argparse
 
+from lms_python.db.analytics import DataAnalytics
 from lms_python.db.connection import connection_manager
 from lms_python.db.ingestion import DataIngestor
 from lms_python.db.schema import SchemaManager
@@ -33,6 +34,9 @@ def main() -> None:
             ingestor.insert_rooms(rooms_data)
             ingestor.insert_students(students_data)
             schema.create_index()
+
+        analytics = DataAnalytics(connection)
+        analytics.execute_reports()
 
 
 if __name__ == "__main__":
