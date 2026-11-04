@@ -1,10 +1,19 @@
 from pathlib import Path
 
-from pydantic import SecretStr
+from pydantic import PostgresDsn, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing_extensions import TypedDict
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 ENV_FILE_PATH = PROJECT_ROOT / ".env"
+
+
+class ConnectionParams(TypedDict, closed=True):
+    host: str
+    port: int
+    dbname: str
+    user: str
+    password: str
 
 
 class DatabaseSettings(BaseSettings):
@@ -23,11 +32,19 @@ class DatabaseSettings(BaseSettings):
 
     @property
     def dsn(self) -> str:
-        password = self.db_pass.get_secret_value()
-        return f"postgresql://{self.db_user}:{password}@{self.db_host}:{self.db_port}/{self.db_name}"
+        return str(
+            PostgresDsn.build(
+                scheme="postgresql",
+                username=self.db_user,
+                password=self.db_pass.get_secret_value(),
+                host=self.db_host,
+                port=self.db_port,
+                path=self.db_name,
+            )
+        )
 
     @property
-    def connection_params(self) -> dict[str, object]:
+    def connection_params(self) -> ConnectionParams:
         return {
             "host": self.db_host,
             "port": self.db_port,
