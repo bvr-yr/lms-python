@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 
 from lms_python.db.loader import DatabaseLoader
-from lms_python.models import Room, Student
+from lms_python.models.source import Room, Student
 
 
 class DataIngestor:

@@ -8,7 +8,7 @@ from lms_python.db.loader import DatabaseLoader
 from lms_python.db.schema import SchemaManager
 from lms_python.exporters.json import JSONExporter
 from lms_python.exporters.xml import XMLExporter
-from lms_python.models import Room, Student
+from lms_python.models.source import Room, Student
 from lms_python.readers.json import JSONReader
 
 EXPORTERS = {
