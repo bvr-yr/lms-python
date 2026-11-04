@@ -4,6 +4,7 @@ from pathlib import Path
 from lms_python.db.analytics import DataAnalytics
 from lms_python.db.connection import connection_manager
 from lms_python.db.ingestion import DataIngestor
+from lms_python.db.loader import DatabaseLoader
 from lms_python.db.schema import SchemaManager
 from lms_python.exporters.json import JSONExporter
 from lms_python.exporters.xml import XMLExporter
@@ -48,7 +49,8 @@ def main() -> None:
             schema.create_tables()
             schema.truncate_tables()
 
-            ingestor = DataIngestor(connection)
+            loader = DatabaseLoader(connection)
+            ingestor = DataIngestor(loader)
             ingestor.insert_rooms(rooms_data)
             ingestor.insert_students(students_data)
             schema.create_index()

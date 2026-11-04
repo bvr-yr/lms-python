@@ -6,8 +6,6 @@ from psycopg.rows import dict_row
 from pydantic import BaseModel
 
 from lms_python.db.resources import load_sql_resource
-
-# from lms_python.exporters.base import ExportData
 from lms_python.models import (
     DiverseGenderRoom,
     RoomAgeDiff,
