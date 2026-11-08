@@ -8,6 +8,8 @@ from lms_python.db.resources import load_sql_resource
 
 logger = logging.getLogger(__name__)
 
+SQL_PACKAGE = "lms_python.sql"
+
 
 class SchemaManager:
     """Executes DDL operations managing database table and index lifecycles."""
@@ -22,10 +24,11 @@ class SchemaManager:
 
     def create_tables(self) -> None:
         """Execute baseline DDL statements to create rooms and students tables."""
-        query = load_sql_resource("lms_python.sql", "create_tables.sql")
+        sql_filename = "create_tables.sql"
+        query = load_sql_resource(SQL_PACKAGE, sql_filename)
         with self._conn.cursor() as cursor:
             cursor.execute(query)
-            logger.info("created tables")
+            logger.info("created tables with %s", sql_filename)
 
     def truncate_tables(self) -> None:
         """Drop dependent indexes and truncate tables with sequence restarts."""
@@ -36,7 +39,9 @@ class SchemaManager:
             logger.info("truncated tables")
 
     def create_index(self) -> None:
-        """Create index on the students table foreign key column (room_id)."""
+        """Execute DDL statement to create index on the students table foreign key column (room_id)."""
+        sql_filename = "create_index.sql"
+        query = load_sql_resource(SQL_PACKAGE, sql_filename)
         with self._conn.cursor() as cursor:
-            cursor.execute("CREATE INDEX idx_students_room_id ON students (room_id);")
-            logger.info("created index")
+            cursor.execute(query)
+            logger.info("created index with %s", sql_filename)

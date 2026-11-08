@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import sys
 from pathlib import Path
 
 import psycopg
@@ -50,7 +51,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def main() -> None:
+def main() -> int:
     """Execute the main ETL pipeline orchestration."""
     setup_logging()
     args = parse_args()
@@ -83,6 +84,8 @@ def main() -> None:
             output_path = OUTPUT_DIR / f"{report_name}.{args.format}"
             exporter.export(data, output_path)
 
+        return 0
+
     except FileNotFoundError as e:
         logger.error("input error: %s", e)
     except TypeError as e:
@@ -96,6 +99,8 @@ def main() -> None:
     except Exception:
         logger.exception("unexpected error")
 
+    return 1
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
