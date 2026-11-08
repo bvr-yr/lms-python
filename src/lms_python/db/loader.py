@@ -22,6 +22,7 @@ class DatabaseLoader:
     def copy_batch(
         self,
         table_name: str,
+        *,
         columns: Sequence[str],
         rows: Iterable[Sequence[object]],
     ) -> None:
@@ -29,9 +30,9 @@ class DatabaseLoader:
 
         :param table_name: Destination PostgreSQL table name.
         :type table_name: str
-        :param columns: Column names matching the positional order of row tuples.
+        :param columns: (keyword-only) Column names matching the positional order of row tuples.
         :type columns: Sequence[str]
-        :param rows: Iterable yielding ordered sequences of column values.
+        :param rows: (keyword-only) Iterable yielding ordered sequences of column values.
         :type rows: Iterable[Sequence[object]]
         """
         copy_sql = sql.SQL("COPY {table} ({fields}) FROM STDIN").format(

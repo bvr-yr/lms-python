@@ -30,7 +30,7 @@ class DataIngestor:
         """
         columns = ("id", "room_name")
         rows = ((room.id, room.name) for room in rooms)
-        self._loader.copy_batch("rooms", columns, rows)
+        self._loader.copy_batch(table_name="rooms", columns=columns, rows=rows)
 
     @perf_logger
     def insert_students(self, students: Iterable[Student]) -> None:
@@ -50,4 +50,4 @@ class DataIngestor:
             )
             for student in students
         )
-        self._loader.copy_batch("students", columns, rows)
+        self._loader.copy_batch(table_name="students", columns=columns, rows=rows)
