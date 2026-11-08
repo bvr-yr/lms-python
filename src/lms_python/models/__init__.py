@@ -1,3 +1,5 @@
+"""Pydantic schemas for source data and analytical query validation."""
+
 from lms_python.models.queries import (
     DiverseGenderRoom,
     RoomAgeDiff,

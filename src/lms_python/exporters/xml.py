@@ -1,3 +1,5 @@
+"""XML-specific exporter implementation."""
+
 import xml.etree.ElementTree as ET
 from collections.abc import Sequence
 from pathlib import Path
@@ -8,6 +10,8 @@ from lms_python.exporters.base import BaseExporter
 
 
 class XMLExporter(BaseExporter):
+    """Exports validated model sequences as indented XML element trees."""
+
     def _write(self, data: Sequence[BaseModel], path: Path) -> None:
         root = ET.Element("results")
 

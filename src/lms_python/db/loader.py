@@ -1,3 +1,5 @@
+"""Data loading utilities."""
+
 import logging
 from collections.abc import Iterable, Sequence
 
@@ -7,7 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 class DatabaseLoader:
+    """Manages data loading using PostgreSQL COPY streaming."""
+
     def __init__(self, connection: Connection) -> None:
+        """Initialize the loader with an open database connection.
+
+        :param connection: Active psycopg connection.
+        :type connection: Connection
+        """
         self._conn = connection
 
     def copy_batch(
@@ -16,6 +25,15 @@ class DatabaseLoader:
         columns: Sequence[str],
         rows: Iterable[Sequence[object]],
     ) -> None:
+        """Stream in-memory rows directly into a table via COPY FROM STDIN.
+
+        :param table_name: Destination PostgreSQL table name.
+        :type table_name: str
+        :param columns: Column names matching the positional order of row tuples.
+        :type columns: Sequence[str]
+        :param rows: Iterable yielding ordered sequences of column values.
+        :type rows: Iterable[Sequence[object]]
+        """
         copy_sql = sql.SQL("COPY {table} ({fields}) FROM STDIN").format(
             table=sql.Identifier(table_name),
             fields=sql.SQL(", ").join(sql.Identifier(col) for col in columns),
