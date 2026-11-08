@@ -1,3 +1,5 @@
+"""Application entry point and CLI orchestration."""
+
 import argparse
 import logging
 from pathlib import Path
@@ -5,7 +7,7 @@ from pathlib import Path
 import psycopg
 from pydantic import ValidationError
 
-from lms_python.db.analytics import DataAnalytics
+from lms_python.db.analytics import DataAnalyticsService
 from lms_python.db.connection import connection_manager
 from lms_python.db.ingestion import DataIngestor
 from lms_python.db.loader import DatabaseLoader
@@ -27,6 +29,11 @@ OUTPUT_DIR = Path("output")
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse CLI arguments.
+
+    :return: Parsed CLI arguments.
+    :rtype: argparse.Namespace
+    """
     parser = argparse.ArgumentParser(description="LMS Python task")
     parser.add_argument(
         "-s", "--students", required=True, help="Path to students JSON file"
@@ -44,6 +51,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Execute the main ETL pipeline orchestration."""
     setup_logging()
     args = parse_args()
 
@@ -67,7 +75,7 @@ def main() -> None:
 
                 schema.create_index()
 
-            analytics = DataAnalytics(connection)
+            analytics = DataAnalyticsService(connection)
             reports = analytics.execute_reports()
 
         exporter = EXPORTERS[args.format]

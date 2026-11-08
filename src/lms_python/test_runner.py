@@ -1,3 +1,5 @@
+"""Unittest discovery and execution script."""
+
 import sys
 import unittest
 from pathlib import Path
@@ -7,6 +9,7 @@ TESTS_DIR = PROJECT_ROOT / "tests"
 
 
 def run_tests() -> None:
+    """Discover and execute all test cases in the tests directory."""
     suite = unittest.defaultTestLoader.discover(str(TESTS_DIR))
     runner = unittest.TextTestRunner(verbosity=2)
     result = runner.run(suite)

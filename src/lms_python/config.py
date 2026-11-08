@@ -1,3 +1,5 @@
+"""Pydantic-based configuration management and environment parsing."""
+
 from pathlib import Path
 from typing import Literal
 
@@ -19,6 +21,8 @@ MODEL_CONFIG = SettingsConfigDict(
 
 
 class ConnectionParams(TypedDict, closed=True):
+    """Type definition for PostgreSQL connection parameters."""
+
     host: str
     port: int
     dbname: str
@@ -27,6 +31,8 @@ class ConnectionParams(TypedDict, closed=True):
 
 
 class AppSettings(BaseSettings):
+    """Application-level settings including logging configuration."""
+
     model_config = MODEL_CONFIG
     lms_log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = (
         DEFAULT_LOG_LEVEL
@@ -34,6 +40,8 @@ class AppSettings(BaseSettings):
 
 
 class DatabaseSettings(BaseSettings):
+    """Database credentials and connection configuration loaded from the environment."""
+
     model_config = MODEL_CONFIG
 
     db_host: str = "localhost"
@@ -44,6 +52,11 @@ class DatabaseSettings(BaseSettings):
 
     @property
     def dsn(self) -> str:
+        """Build a standard PostgreSQL Data Source Name (DSN) URI.
+
+        :return: Fully qualified database connection URI.
+        :rtype: str
+        """
         return str(
             PostgresDsn.build(
                 scheme="postgresql",
@@ -57,6 +70,11 @@ class DatabaseSettings(BaseSettings):
 
     @property
     def connection_params(self) -> ConnectionParams:
+        """Convert validated instance settings into psycopg connection parameters.
+
+        :return: Parameter dictionary matching psycopg.connect kwargs.
+        :rtype: ConnectionParams
+        """
         return {
             "host": self.db_host,
             "port": self.db_port,
