@@ -1,4 +1,3 @@
-import unittest
 from datetime import datetime
 from unittest.mock import MagicMock
 
@@ -7,30 +6,40 @@ from lms_python.db.loader import DatabaseLoader
 from lms_python.models.source import Room, Student
 
 
-class TestDataIngestor(unittest.TestCase):
-    def setUp(self) -> None:
-        self.mock_loader = MagicMock(spec=DatabaseLoader)
-        self.ingestor = DataIngestor(self.mock_loader)
+def test_insert_rooms_mapping():
+    mock_loader = MagicMock(spec=DatabaseLoader)
+    ingestor = DataIngestor(mock_loader)
 
-    def test_insert_rooms_mapping(self) -> None:
-        rooms = [Room(id=1, name="Room #1"), Room(id=2, name="Room #2")]
-        self.ingestor.insert_rooms(rooms)
+    rooms = [Room(id=1, name="Room 1"), Room(id=2, name="Room 2")]
+    ingestor.insert_rooms(rooms)
 
-        self.mock_loader.copy_batch.assert_called_once()
-        table_name, columns, rows_gen = self.mock_loader.copy_batch.call_args[0]
+    mock_loader.copy_batch.assert_called_once()
+    kwargs = mock_loader.copy_batch.call_args.kwargs
 
-        self.assertEqual(table_name, "rooms")
-        self.assertEqual(columns, ("id", "room_name"))
-        self.assertEqual(list(rows_gen), [(1, "Room #1"), (2, "Room #2")])
+    table_name = kwargs["table_name"]
+    columns = kwargs["columns"]
+    rows = list(kwargs["rows"])
 
-    def test_insert_students_mapping(self) -> None:
-        now = datetime(2000, 1, 1, 0, 0)
-        students = [Student(id=1, name="Alice", birthday=now, room=10, sex="F")]
-        self.ingestor.insert_students(students)
+    assert table_name == "rooms"
+    assert columns == ("id", "room_name")
+    assert rows == [(1, "Room 1"), (2, "Room 2")]
 
-        self.mock_loader.copy_batch.assert_called_once()
-        table_name, columns, rows_gen = self.mock_loader.copy_batch.call_args[0]
 
-        self.assertEqual(table_name, "students")
-        self.assertEqual(columns, ("id", "full_name", "birthday", "gender", "room_id"))
-        self.assertEqual(list(rows_gen), [(1, "Alice", now, "F", 10)])
+def test_insert_students_mapping():
+    mock_loader = MagicMock(spec=DatabaseLoader)
+    ingestor = DataIngestor(mock_loader)
+
+    now = datetime(2000, 1, 1, 0, 0)
+    students = [Student(id=1, name="Alice", birthday=now, room=10, sex="F")]
+    ingestor.insert_students(students)
+
+    mock_loader.copy_batch.assert_called_once()
+    kwargs = mock_loader.copy_batch.call_args.kwargs
+
+    table_name = kwargs["table_name"]
+    columns = kwargs["columns"]
+    rows = list(kwargs["rows"])
+
+    assert table_name == "students"
+    assert columns == ("id", "full_name", "birthday", "gender", "room_id")
+    assert rows == [(1, "Alice", now, "F", 10)]

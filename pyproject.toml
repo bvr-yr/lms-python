@@ -14,8 +14,12 @@ dependencies = [
 
 [project.scripts]
 task = "lms_python.main:main"
-tests = "lms_python.test_runner:run_tests"
 
 [build-system]
 requires = ["uv_build>=0.13.1,<0.14.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
