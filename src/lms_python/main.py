@@ -11,7 +11,7 @@ from pydantic import ValidationError
 from lms_python.db.analytics import DataAnalyticsService
 from lms_python.db.connection import connection_manager
 from lms_python.db.ingestion import DataIngestor
-from lms_python.db.loader import DatabaseLoader
+from lms_python.db.loader import PostgresLoader
 from lms_python.db.schema import SchemaManager
 from lms_python.exporters.json import JSONExporter
 from lms_python.exporters.xml import XMLExporter
@@ -67,7 +67,7 @@ def main() -> int:
                 schema.create_tables()
                 schema.truncate_tables()
 
-                loader = DatabaseLoader(connection)
+                loader = PostgresLoader(connection)
                 ingestor = DataIngestor(loader)
 
                 with timer("ingestion"):
