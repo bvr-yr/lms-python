@@ -10,7 +10,8 @@ from pydantic import ValidationError
 
 from lms_python.db.analytics import DataAnalyticsService
 from lms_python.db.connection import connection_manager
-from lms_python.db.ingestion import DataIngestor
+from lms_python.db.ingestion.ingestor import DataIngestor
+from lms_python.db.ingestion.spec import ROOM_SPEC, STUDENT_SPEC
 from lms_python.db.loader import PostgresLoader
 from lms_python.db.schema import SchemaManager
 from lms_python.exporters.json import JSONExporter
@@ -52,7 +53,11 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
-    """Execute the main ETL pipeline orchestration."""
+    """Execute the main ETL pipeline orchestration.
+
+    :return: Process exit status code (0 for success, 1 for failure).
+    :rtype: int
+    """
     setup_logging()
     args = parse_args()
 
@@ -71,8 +76,8 @@ def main() -> int:
                 ingestor = DataIngestor(loader)
 
                 with timer("ingestion"):
-                    ingestor.insert_rooms(rooms_data)
-                    ingestor.insert_students(students_data)
+                    ingestor.insert(rooms_data, ROOM_SPEC)
+                    ingestor.insert(students_data, STUDENT_SPEC)
 
                 schema.create_index()
 
