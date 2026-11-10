@@ -6,12 +6,11 @@ import time
 from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from functools import wraps
-from typing import Any
 
 from lms_python.config import app_settings
 
 LOG_FORMAT = (
-    "%(asctime)s | %(relative_sec)7s | %(levelname)-7s | %(name)-28s | %(message)s"
+    "%(asctime)s | %(relative_sec)7s | %(levelname)-7s | %(name)-32s | %(message)s"
 )
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
@@ -68,17 +67,17 @@ def timer(
         log.debug("%s finished in %.4f seconds", description, elapsed)
 
 
-def perf_logger(func: Callable[..., Any]) -> Callable[..., Any]:
+def perf_logger[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     """Log execution duration and callable identity at DEBUG level.
 
     :param func: Target callable to benchmark and wrap.
-    :type func: Callable[..., Any]
+    :type func: Callable
     :return: Wrapped callable preserving the original signature and return value.
-    :rtype: Callable[..., Any]
+    :rtype: Callable
     """
 
     @wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> Any:
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         now = time.perf_counter()
         result = func(*args, **kwargs)
         elapsed = time.perf_counter() - now
