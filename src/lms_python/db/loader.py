@@ -8,7 +8,7 @@ from psycopg import Connection, sql
 logger = logging.getLogger(__name__)
 
 
-class DatabaseLoader:
+class PostgresLoader:
     """Manages data loading using PostgreSQL COPY streaming."""
 
     def __init__(self, connection: Connection) -> None:
@@ -19,7 +19,7 @@ class DatabaseLoader:
         """
         self._conn = connection
 
-    def copy_batch(
+    def load(
         self,
         table_name: str,
         *,
