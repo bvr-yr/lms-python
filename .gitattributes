@@ -1,0 +1,2 @@
+data/*.json linguist-vendored
+data/*.json -diff
