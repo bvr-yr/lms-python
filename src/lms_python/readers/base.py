@@ -10,13 +10,6 @@ from pydantic import BaseModel
 
 from lms_python.logger import perf_logger
 
-# T = TypeVar("T", bound=BaseModel)
-
-# from pydantic import TypeAdapter
-# ta = TypeAdapter(list[model])
-# return ta.validate_python(raw_data)
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -44,14 +37,6 @@ class BaseReader(ABC):
         raw_data = self._read(path)
         logger.info("read data from %s", file_path)
 
-        if not isinstance(raw_data, list):
-            error_message = (
-                f"expected top-level JSON array in {path.name!r}, "
-                f"got {type(raw_data).__name__!r}"
-            )
-            raise TypeError(error_message)
-
-        # return (model.model_validate(item) for item in raw_data)
         return map(model.model_validate, raw_data)
 
     @abstractmethod

@@ -1,19 +1,15 @@
 """Pydantic-based configuration management and environment parsing."""
 
-from pathlib import Path
 from typing import Literal
 
 from pydantic import PostgresDsn, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing_extensions import TypedDict
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-ENV_FILE_PATH = PROJECT_ROOT / ".env"
-
 DEFAULT_LOG_LEVEL = "ERROR"
 
 MODEL_CONFIG = SettingsConfigDict(
-    env_file=ENV_FILE_PATH,
+    env_file=".env",
     env_file_encoding="utf-8",
     extra="ignore",
     case_sensitive=False,
